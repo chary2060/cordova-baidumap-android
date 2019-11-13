@@ -11,9 +11,12 @@ module.exports = function (context) {
             if (err) {
                 throw new Error('Unable to find AndroidManifest.xml: ' + err);
             }
-            if (data.indexOf(appClass) == -1) {
-             
-            }
+            var result = data.replace(/android:name="com.qdc.plugins.baidu.DemoApplication"/g, '')
+                .replace(/<activity android:name="com.qdc.plugins.baidu.MapActivity" \/>/g, '')
+                .replace(/android:theme="@style\/Theme.AppCompat.Light.DarkActionBar"/g, '');
+            fs.writeFile(manifestFile, result, 'utf8', function (err) {
+                if (err) throw new Error('Unable to write into AndroidManifest.xml: ' + err);
+            })
         });
     }
 };

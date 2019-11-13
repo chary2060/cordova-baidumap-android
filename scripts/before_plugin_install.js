@@ -12,7 +12,7 @@ module.exports = function (context) {
                 throw new Error('Unable to find AndroidManifest.xml: ' + err);
             }
             if (data.indexOf(appClass) == -1) {
-                var result = data.replace(/<application/g, '<application android:name="' + appClass + '"')
+                var result = data.replace(/<application/g, '<application android:name="' + appClass + '" android:theme="@style\/Theme.AppCompat.Light.DarkActionBar"')
                     .replace(/<\/application>/g, '<activity android:name="com.qdc.plugins.baidu.MapActivity"></activity><\/application>');
 
                 fs.writeFile(manifestFile, result, 'utf8', function (err) {
