@@ -6,7 +6,10 @@
     <clobbers target="baidu_location" />
   </js-module>
 
-  <preference name="API_KEY" default="NT7NK9NrxaZi0GDSU6uBgW9GiqKrNV7i" />
+  <preference name="ANDROID_KEY" default="DC0uCnkmo21Iw00MmezNZtLT94MfyqwM"/>
+  <preference name="IOS_KEY" default="BBWftrMbrC6KhFEeFI7dzYjpFZLeTPPt"/>
+  <preference name="IOS_LOCATION_DESC" default="获取用户当前位置"/>
+  <preference name="IOS_ALWAYS_LOCATION_DESC" default="持续获取地理位置"/>
 
   <!-- android -->
   <platform name="android">
@@ -42,23 +45,23 @@
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
       <!-- 在application标签中声明service组件,每个app拥有自己单独的定位service -->
       <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote" />
-      <meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="$API_KEY" />
+      <meta-data android:name="com.baidu.lbsapi.ANDROID_KEY" android:value="$ANDROID_KEY" />
     </config-file>
 
     <source-file src="src/android/BaiduLocation.java" target-dir="src/com/qdc/plugins/baidu" />
     <source-file src="src/android/DemoApplication.java" target-dir="src/com/qdc/plugins/baidu" />
     <source-file src="src/android/MapActivity.java" target-dir="src/com/qdc/plugins/baidu" />
 
-    <source-file src="libs/arm64-v8a/" target-dir="app/libs/" />
-    <source-file src="libs/armeabi/" target-dir="app/libs/" />
-    <source-file src="libs/armeabi-v7a/" target-dir="app/libs/" />
-    <source-file src="libs/x86/" target-dir="app/libs/" />
-    <source-file src="libs/x86_64/" target-dir="app/libs/" />
-    <source-file src="libs/BaiduLBS_Android.jar" target-dir="app/libs/" />
-    <source-file src="libs/IndoorscapeAlbumPlugin.jar" target-dir="app/libs/" />
-    <source-file src="libs/SecurityEnvSDK-release-1.1.0.jar" target-dir="app/libs/" />
-    <source-file src="libs/tbs_sdk_thirdapp_v3.1.0.1034_43100_sharewithdownload_obfs_20170301_182143.jar" target-dir="app/libs/" />
-    <source-file src="libs/utdid4all-1.1.5.3_proguard.jar" target-dir="app/libs/" />
+    <source-file src="libs/android/arm64-v8a/" target-dir="app/libs/" />
+    <source-file src="libs/android/armeabi/" target-dir="app/libs/" />
+    <source-file src="libs/android/armeabi-v7a/" target-dir="app/libs/" />
+    <source-file src="libs/android/x86/" target-dir="app/libs/" />
+    <source-file src="libs/android/x86_64/" target-dir="app/libs/" />
+    <source-file src="libs/android/BaiduLBS_Android.jar" target-dir="app/libs/" />
+    <source-file src="libs/android/IndoorscapeAlbumPlugin.jar" target-dir="app/libs/" />
+    <source-file src="libs/android/SecurityEnvSDK-release-1.1.0.jar" target-dir="app/libs/" />
+    <source-file src="libs/android/tbs_sdk_thirdapp_v3.1.0.1034_43100_sharewithdownload_obfs_20170301_182143.jar" target-dir="app/libs/" />
+    <source-file src="libs/android/utdid4all-1.1.5.3_proguard.jar" target-dir="app/libs/" />
 
     <source-file src="res/menu/" target-dir="app/src/main/res/" />
     <source-file src="res/layout/" target-dir="app/src/main/res/" />
@@ -71,27 +74,60 @@
   <hook type="before_plugin_install" src="scripts/before_plugin_install.js" />
   <hook type="before_plugin_uninstall" src="scripts/before_plugin_uninstall.js" />
 
-  
-  <!-- ios
-    <platform name="ios">
-        <config-file target="config.xml" parent="/*">
-            <feature name="BaiduPush">
-                <param name="ios-package" value="BaiduPushPlugin"/>
-            </feature>
-        </config-file>
-        
-        <header-file src="src/ios/BaiduPushPlugin.h" />
-        <source-file src="src/ios/BaiduPushPlugin.m" /> -->
+  <!--ios-->
+  <platform name="ios">
+    <config-file parent="/*" target="config.xml">
+      <feature name="BaiduLocation">
+        <param name="ios-package" value="BaiduLocation" />
+      </feature>
+    </config-file>
 
-  <!-- Wechat Official
-      <header-file src="libs/ios/BPush.h" />
-      <source-file src="libs/ios/libBPush.a" framework="true" /> -->
+    <!--为了能够在iOS9中正常使用非HTTPS协议-->
+    <config-file parent="NSAppTransportSecurity" target="*-Info.plist">
+      <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true />
+      </dict>
+    </config-file>
 
-  <!-- Other required frameworks
-      <framework src="libz.dylib" />
-      <framework src="Foundation.framework" />
-      <framework src="CoreTelephony.framework" />
-      <framework src="SystemConfiguration.framework" />
+    <!--定位模式 TODO 设置为前后台永远定位-->
+    <!--NSLocationAlwaysUsageDescription / NSLocationWhenInUseUsageDescription-->
+    <config-file parent="NSLocationWhenInUseUsageDescription" target="*-Info.plist">
+      <string>$IOS_LOCATION_DESC</string>
+    </config-file>
+    <config-file parent="NSLocationAlwaysUsageDescription" target="*-Info.plist">
+      <string>$IOS_ALWAYS_LOCATION_DESC</string>
+    </config-file>
 
-    </platform> -->
+    <config-file parent="BaiduLocation" target="*-Info.plist">
+      <dict>
+        <key>IOS_KEY</key>
+        <string>$IOS_KEY</string>
+      </dict>
+    </config-file>
+
+    <!--源文件-->
+    <header-file src="src/ios/BaiduLocation.h" />
+    <source-file src="src/ios/BaiduLocation.mm" />
+
+    <!--库文件-->
+
+    <framework src="libs/ios/BMKLocationKit.framework" custom="true" />
+
+    <source-file src="libs/ios/thirdlibs/libcrypto.a" framework="true" />
+    <source-file src="libs/ios/thirdlibs/libssl.a" framework="true" />
+
+    <framework src="CoreGraphics.framework" />
+    <framework src="CoreLocation.framework" />
+    <framework src="MobileCoreServices.framework" />
+    <framework src="OpenGLES.framework" />
+    <framework src="QuartzCore.framework" />
+    <framework src="Security.framework" />
+    <framework src="SystemConfiguration.framework" />
+    <framework src="libsqlite3.0.tbd" />
+    <framework src="CoreTelephony.framework" />
+    <framework src="libc++.tbd" />
+    <framework src="AdSupport.framework" />
+  </platform>
+
 </plugin>
